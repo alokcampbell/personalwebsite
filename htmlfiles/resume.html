@@ -191,58 +191,76 @@
   </div>
 
   <script>
-    // Generate specs that fall like snow from above the screen
     const container = document.getElementById('spec-container');
     const numberOfSpecs = 1000;
     
-    // Check if specs data exists in localStorage
-    let specs = JSON.parse(localStorage.getItem('specs') || '[]');
+    if (!sessionStorage.getItem('specSessionId')) {
+      sessionStorage.setItem('specSessionId', Date.now().toString());
+    }
+    const sessionId = sessionStorage.getItem('specSessionId');
     
-    // If no specs exist, create them starting above the viewport
-    if (specs.length === 0) {
+    const storageKey = 'specs-' + sessionId;
+    
+    let specs = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    
+    const createNewSpecs = () => {
+      const newSpecs = [];
       for (let i = 0; i < numberOfSpecs; i++) {
-        specs.push({
+        newSpecs.push({
+          id: i,
           left: Math.random() * 100,
-          top: -5 - (Math.random() * 100), // All start above viewport at different heights
+          top: -5 - (Math.random() * 200),
           duration: 6 + Math.random() * 6,
-          delay: Math.random() * 5
+          delay: 0
         });
       }
-      // Save to localStorage
-      localStorage.setItem('specs', JSON.stringify(specs));
+      return newSpecs;
+    };
+    
+    if (specs.length === 0) {
+      specs = createNewSpecs();
+      localStorage.setItem(storageKey, JSON.stringify(specs));
     }
     
-    // Create and position the specs based on stored data
     specs.forEach(specData => {
       const spec = document.createElement('div');
       spec.classList.add('spec');
       spec.style.left = `${specData.left}%`;
       spec.style.top = `${specData.top}%`;
       spec.style.animationDuration = `${specData.duration}s`;
-      spec.style.animationDelay = `${specData.delay}s`;
+      spec.dataset.id = specData.id;
       container.appendChild(spec);
     });
     
-    // Update spec positions periodically
-    setInterval(() => {
+    const updateSpecs = () => {
       const specElements = document.querySelectorAll('.spec');
-      specElements.forEach((spec, index) => {
-        // Get computed position
-        const rect = spec.getBoundingClientRect();
+      
+      specElements.forEach(specElement => {
+        const id = parseInt(specElement.dataset.id);
+        const specData = specs.find(s => s.id === id);
+        
+        if (!specData) return;
+        
+        const rect = specElement.getBoundingClientRect();
         const parentRect = container.getBoundingClientRect();
         
-        // Calculate percentage positions
-        specs[index].top = (rect.top / parentRect.height) * 100;
+        specData.top = (rect.top / parentRect.height) * 100;
         
-        // Reset spec if it goes off-screen
-        if (specs[index].top > 100) {
-          specs[index].top = -5; // Reset to just above the viewport
+        if (specData.top > 100) {
+          specData.left = Math.random() * 100;
+          specData.top = -5;
+          
+          specElement.style.left = `${specData.left}%`;
+          specElement.style.top = `${specData.top}%`;
         }
       });
       
-      // Save updated positions
-      localStorage.setItem('specs', JSON.stringify(specs));
-    }, 1000);
+      localStorage.setItem(storageKey, JSON.stringify(specs));
+      
+      requestAnimationFrame(updateSpecs);
+    };
+    
+    updateSpecs();
   </script>
 </body>
 </html>
