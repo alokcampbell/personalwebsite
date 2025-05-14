@@ -32,6 +32,7 @@
       background: rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       animation: fall linear infinite;
+      box-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
     }
 
     @keyframes fall {
@@ -115,19 +116,58 @@
   </div>
 
   <script>
-    // Generate specs
+    // Generate specs with localStorage persistence
     const container = document.getElementById('spec-container');
     const numberOfSpecs = 1000;
-
-    for (let i = 0; i < numberOfSpecs; i++) {
+    
+    // Check if specs data exists in localStorage
+    let specs = JSON.parse(localStorage.getItem('specs') || '[]');
+    
+    // Generate new specs if none exist
+    if (specs.length === 0) {
+      for (let i = 0; i < numberOfSpecs; i++) {
+        specs.push({
+          left: Math.random() * 100,
+          top: Math.random() * 100,
+          duration: 6 + Math.random() * 6,
+          delay: Math.random() * 5
+        });
+      }
+      // Save to localStorage
+      localStorage.setItem('specs', JSON.stringify(specs));
+    }
+    
+    // Create and position the specs based on stored data
+    specs.forEach(specData => {
       const spec = document.createElement('div');
       spec.classList.add('spec');
-      spec.style.left = `${Math.random() * 100}%`;
-      spec.style.top = `-5%`;
-      spec.style.animationDuration = `${6 + Math.random() * 6}s`;
-      spec.style.animationDelay = `${Math.random() * 5}s`;
+      spec.style.left = `${specData.left}%`;
+      spec.style.top = `${specData.top}%`;
+      spec.style.animationDuration = `${specData.duration}s`;
+      spec.style.animationDelay = `${specData.delay}s`;
       container.appendChild(spec);
-    }
+    });
+    
+    // Update spec positions periodically
+    setInterval(() => {
+      const specElements = document.querySelectorAll('.spec');
+      specElements.forEach((spec, index) => {
+        // Get computed position
+        const rect = spec.getBoundingClientRect();
+        const parentRect = container.getBoundingClientRect();
+        
+        // Calculate percentage positions
+        specs[index].top = (rect.top / parentRect.height) * 100;
+        
+        // Reset spec if it goes off-screen
+        if (specs[index].top > 100) {
+          specs[index].top = -5;
+        }
+      });
+      
+      // Save updated positions
+      localStorage.setItem('specs', JSON.stringify(specs));
+    }, 1000);
   </script>
 </body>
 </html>
