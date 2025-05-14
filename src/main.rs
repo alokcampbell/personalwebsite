@@ -1,15 +1,16 @@
-use actix_files::Files;
-use actix_web::{App, HttpServer};
+use actix_files::NamedFile;
+use actix_web::{web::ServiceConfig, HttpRequest, Responder};
+use shuttle_actix_web::ShuttleActixWeb;
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    println!("Server starting at http://127.0.0.1:8080");
+async fn index(_req: HttpRequest) -> impl Responder {
+    NamedFile::open("static/index.html")
+}
 
-    HttpServer::new(|| {
-        App::new()
-            .service(Files::new("/", "./static").index_file("index.html"))
-    })
-    .bind("127.0.0.1:8080")?
-    .run()
-    .await
+#[shuttle_runtime::main]
+async fn actix_web() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
+    let config = |cfg: &mut ServiceConfig| {
+        cfg.default_service(actix_web::web::to(index));
+    };
+
+    Ok(config.into())
 }
