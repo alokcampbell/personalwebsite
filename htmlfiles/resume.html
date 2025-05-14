@@ -36,8 +36,20 @@
     }
 
     @keyframes fall {
-      to {
-        transform: translateY(100vh);
+      0% {
+        transform: translateY(0) translateX(0);
+      }
+      25% {
+        transform: translateY(25vh) translateX(10px);
+      }
+      50% {
+        transform: translateY(50vh) translateX(-10px);
+      }
+      75% {
+        transform: translateY(75vh) translateX(5px);
+      }
+      100% {
+        transform: translateY(100vh) translateX(-5px);
       }
     }
 
@@ -179,19 +191,19 @@
   </div>
 
   <script>
-    // Generate specs with localStorage persistence
+    // Generate specs that fall like snow from above the screen
     const container = document.getElementById('spec-container');
     const numberOfSpecs = 1000;
     
     // Check if specs data exists in localStorage
     let specs = JSON.parse(localStorage.getItem('specs') || '[]');
     
-    // Generate new specs if none exist
+    // If no specs exist, create them starting above the viewport
     if (specs.length === 0) {
       for (let i = 0; i < numberOfSpecs; i++) {
         specs.push({
           left: Math.random() * 100,
-          top: Math.random() * 100,
+          top: -5 - (Math.random() * 100), // All start above viewport at different heights
           duration: 6 + Math.random() * 6,
           delay: Math.random() * 5
         });
@@ -224,7 +236,7 @@
         
         // Reset spec if it goes off-screen
         if (specs[index].top > 100) {
-          specs[index].top = -5;
+          specs[index].top = -5; // Reset to just above the viewport
         }
       });
       
