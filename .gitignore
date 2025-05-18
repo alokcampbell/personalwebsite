@@ -19,3 +19,4 @@ target/
 .shuttle*
 Secrets*.toml
 .vscode
+/htmlfiles/files/

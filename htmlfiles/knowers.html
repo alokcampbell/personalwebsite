@@ -68,6 +68,7 @@
       font-size: 3rem;
       opacity: 0;
       animation: riseUp 2.5s ease-out 1s forwards;
+      z-index: 3;
     }
 
     @keyframes riseUp {
@@ -112,6 +113,163 @@
       color: rgba(255, 255, 255, 0.5);
       z-index: 2;
     }
+
+    .nite-interface-root {
+      position: absolute;
+      top: 15%;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      max-width: 1600px;
+      display: flex;
+      gap: 10px;
+      z-index: 1;
+      font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+    }
+
+    .nite-left-column {
+      flex: 3;
+      background: rgba(25, 35, 45, 0.30);
+      border: 1px solid #ffffff;
+      border-radius: 3px;
+      padding: 15px;
+      color: #cccccc;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 1.5s ease-in-out, padding 1.5s ease-in-out; 
+    }
+
+    .nite-right-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nite-module {
+      background: rgba(25, 35, 45, 0.30);
+      border: 1px solid #ffffff;
+      border-radius: 3px;
+      padding: 10px;
+      color: #cccccc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nite-module-title {
+      font-size: 0.85em;
+      color: #ffffff;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(48, 213, 200, 0.2);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .nite-module-content {
+      font-size: 0.9em;
+      flex-grow: 1;
+    }
+    
+    .nite-left-column p {
+        margin: 2px 0;
+        font-size: 0.95em;
+        line-height: 1.4;
+    }
+    .nite-left-column p:first-child {
+        margin-top: 0;
+    }
+
+    .nite-cli-output {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-bottom: 10px;
+    }
+
+    .nite-cli-input-row {
+      display: flex;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      margin-top: auto;
+    }
+
+    .nite-cli-prompt {
+      color: #ffffff;
+      font-weight: 600;
+      margin-right: 8px;
+      font-size: 0.95em;
+    }
+
+    .nite-cli-input {
+      flex-grow: 1;
+      background: transparent;
+      border: none;
+      color: #cccccc;
+      font-family: inherit;
+      font-size: 0.95em;
+      outline: none;
+    }
+
+    .nite-module.sys-specs { 
+      flex: 0 0 50px; 
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nite-module.sys-specs .nite-module-title {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      font-size: 0.9em;
+    }
+    .nite-module.system-clear { flex: 0 0 40px; text-align: center; justify-content: center; cursor: pointer; transition: background-color 0.2s; }
+    .nite-module.system-clear:hover { background-color: rgba(45, 55, 65, 0.9); }
+    .nite-module.scratch { flex: 1 1 150px; }
+    .nite-module.scratch .nite-module-content {
+      padding: 5px 0 0 0;
+      display: flex;
+      align-items: stretch;
+    }
+    .nite-module.chat { flex: 2 1 200px; }
+    #network-graph-canvas {
+      width: 100%;
+      height: 100%;
+      background-color: #0A0F14;
+      border-radius: 2px;
+    }
+    .nite-left-column.theater-mode-active {
+        background-color: #000000 !important; 
+        padding: 0 !important; 
+        overflow: hidden !important; 
+        transition: background-color 0.5s ease-out, padding 0.5s ease-out; 
+    }
+    .theater-mode-content-hidden {
+        opacity: 0 !important;
+        transition: opacity 0.3s ease-out;
+        pointer-events: none !important;
+    }
+    #nite-cli-output.theater-mode-content-visible, 
+    .nite-cli-input-row.theater-mode-content-visible {
+        opacity: 1 !important;
+        transition: opacity 1.5s ease-in; 
+        pointer-events: auto !important;
+    }
+    .video-player-temp {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        opacity: 1; 
+    }
   </style>
 </head>
 <body>
@@ -119,6 +277,37 @@
 
   <div class="container">
     <div class="welcome">Knowers Abyss</div>
+
+    <div class="nite-interface-root">
+      <div class="nite-left-column">
+        <div class="nite-cli-output" id="nite-cli-output">
+          
+        </div>
+        <div class="nite-cli-input-row">
+          <span class="nite-cli-prompt">&gt;</span>
+          <input type="text" class="nite-cli-input" id="nite-cli-input" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+      <div class="nite-right-column">
+        <div class="nite-module sys-specs">
+          <div class="nite-module-title">system terminal - jailbroken</div>
+        </div>
+        <div class="nite-module system-clear">
+          status - clear
+        </div>
+        <div class="nite-module scratch">
+          <div class="nite-module-title">network terminal - jailbroken</div>
+          <div class="nite-module-content">
+            <canvas id="network-graph-canvas"></canvas>
+          </div>
+        </div>
+        <div class="nite-module chat">
+          <div class="nite-module-title">output</div>
+          <div class="nite-module-content" id="output-module-content"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="button-row">
         <a href="index.html"><button>Home</button></a>
     </div>      
@@ -146,7 +335,7 @@
           left: Math.random() * 100,
           top: -5 - (Math.random() * 200),
           duration: 6 + Math.random() * 6,
-          delay: 0
+          delay: Math.random() * 5
         });
       }
       return newSpecs;
@@ -157,45 +346,311 @@
       localStorage.setItem(storageKey, JSON.stringify(specs));
     }
     
+    while(container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+
     specs.forEach(specData => {
       const spec = document.createElement('div');
       spec.classList.add('spec');
       spec.style.left = `${specData.left}%`;
       spec.style.top = `${specData.top}%`;
       spec.style.animationDuration = `${specData.duration}s`;
+      spec.style.animationDelay = `${specData.delay}s`;
       spec.dataset.id = specData.id;
       container.appendChild(spec);
     });
-    
-    const updateSpecs = () => {
-      const specElements = document.querySelectorAll('.spec');
-      
-      specElements.forEach(specElement => {
-        const id = parseInt(specElement.dataset.id);
-        const specData = specs.find(s => s.id === id);
-        
-        if (!specData) return;
-        
-        const rect = specElement.getBoundingClientRect();
-        const parentRect = container.getBoundingClientRect();
-        
-        specData.top = (rect.top / parentRect.height) * 100;
-        
-        if (specData.top > 100) {
-          specData.left = Math.random() * 100;
-          specData.top = -5;
-          
-          specElement.style.left = `${specData.left}%`;
-          specElement.style.top = `${specData.top}%`;
-        }
-      });
-      
-      localStorage.setItem(storageKey, JSON.stringify(specs));
-      
-      requestAnimationFrame(updateSpecs);
+
+    const cliOutput = document.getElementById('nite-cli-output');
+    const cliInput = document.getElementById('nite-cli-input');
+    const networkCanvas = document.getElementById('network-graph-canvas');
+    const outputModuleContent = document.getElementById('output-module-content'); 
+    const niteLeftColumn = document.querySelector('.nite-left-column');
+    const niteCliInputRow = document.querySelector('.nite-cli-input-row');
+    const systemClearModule = document.querySelector('.nite-module.system-clear');
+
+    let activityFactor = 0.3;
+    let longActivityTimer = null;
+    let shortActivityTimer = null;
+
+    const keywordResponses = {
+        "weepies": "gotta sell it",
+        "gerbil": "mania",
     };
-    
-    updateSpecs();
+
+    function processCliCommand(commandText) {
+        if (!outputModuleContent) {
+            console.error("Output module content area not found!");
+            return;
+        }
+        if (systemClearModule) systemClearModule.textContent = "status - ongoing search";
+
+        const findingDiv = document.createElement('div');
+        findingDiv.textContent = "Finding...";
+        findingDiv.style.color = "white";
+        outputModuleContent.appendChild(findingDiv);
+        outputModuleContent.scrollTop = outputModuleContent.scrollHeight;
+
+        setTimeout(() => {
+            const command = commandText.toLowerCase(); 
+            const response = keywordResponses[command];
+
+            if (response || command === "jerboa" || command === "jeroba" || command === "dolphin") { 
+                const loadingDiv = document.createElement('div');
+                loadingDiv.textContent = "Loading...";
+                loadingDiv.style.color = "lightgreen";
+                outputModuleContent.appendChild(loadingDiv);
+                outputModuleContent.scrollTop = outputModuleContent.scrollHeight;
+
+                setTimeout(() => {
+                    if (command === "jerboa") {
+                        const img = document.createElement('img');
+                        img.src = "files/jerboa.png";
+                        img.alt = "Jerboa image";
+                        img.style.maxWidth = "100%";
+                        img.style.maxHeight = "250px"; 
+                        img.style.display = "block"; 
+                        img.style.marginTop = "5px"; 
+                        cliOutput.appendChild(img);
+                        cliOutput.scrollTop = cliOutput.scrollHeight;
+                    } else if (command === "jeroba") { 
+                        const img = document.createElement('img');
+                        img.src = "files/jerboa-edit.gif";
+                        img.alt = "Jeroba GIF";
+                        img.style.maxWidth = "100%";
+                        img.style.maxHeight = "250px"; 
+                        img.style.display = "block"; 
+                        img.style.marginTop = "5px"; 
+                        cliOutput.appendChild(img);
+                        cliOutput.scrollTop = cliOutput.scrollHeight;
+                    } else if (command === "dolphin") {
+                        enterMovieMode("files/dolphin.mp4"); 
+                    } else if (response) {
+                        const blurbDiv = document.createElement('div');
+                        blurbDiv.textContent = response;
+                        blurbDiv.style.whiteSpace = 'pre-wrap'; 
+                        cliOutput.appendChild(blurbDiv); 
+                        cliOutput.scrollTop = cliOutput.scrollHeight;
+                        if (systemClearModule) systemClearModule.textContent = "status - clear"; 
+                    }
+                }, 1000 + Math.random() * 1000); 
+            } else {
+                const notFoundDiv = document.createElement('div');
+                notFoundDiv.textContent = "Keyword not found";
+                notFoundDiv.style.color = "red";
+                outputModuleContent.appendChild(notFoundDiv);
+                outputModuleContent.scrollTop = outputModuleContent.scrollHeight;
+                if (systemClearModule) systemClearModule.textContent = "status - clear";
+            }
+        }, 1500 + Math.random() * 1000); 
+    }
+
+    if (cliInput) { 
+        cliInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const commandText = cliInput.value.trim();
+                if (commandText) {
+                    const userCommandDiv = document.createElement('div');
+                    userCommandDiv.innerHTML = `<span class="nite-cli-prompt">&gt;</span> ${commandText}`;
+                    cliOutput.appendChild(userCommandDiv);
+
+                    if (networkCanvas) {
+                        activityFactor = 1.0;
+                        if (shortActivityTimer) clearTimeout(shortActivityTimer);
+                        shortActivityTimer = null;
+                        if (longActivityTimer) clearTimeout(longActivityTimer);
+                        
+                        const randomDuration = Math.random() * 5000 + 5000; 
+                        longActivityTimer = setTimeout(() => {
+                            activityFactor = 0.3;
+                            longActivityTimer = null;
+                        }, randomDuration);
+                    }
+                    
+                    cliInput.value = '';
+                    processCliCommand(commandText);
+                } else {
+                    if (systemClearModule && !niteLeftColumn.classList.contains('theater-mode-active')) {
+                        systemClearModule.textContent = "status - clear";
+                    }
+                }
+                e.preventDefault();
+            }
+        });
+    }
+
+    if (networkCanvas) {
+        const ctx = networkCanvas.getContext('2d');
+        let animationFrameId;
+        
+        const numPoints = 60;
+        const spikyWave = new Array(numPoints).fill(0);
+        const smoothWave = new Array(numPoints).fill(0);
+
+        function resizeCanvas() {
+            networkCanvas.width = networkCanvas.clientWidth;
+            networkCanvas.height = networkCanvas.clientHeight;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            drawNetworkGraph(); 
+        }
+
+        function updateGraphData() {
+            spikyWave.shift();
+            smoothWave.shift();
+
+            const spikyBaseAmplitude = networkCanvas.height * 0.5;
+            const spikyOffset = networkCanvas.height * 0.1;
+            const newSpikyPoint = (Math.random() * spikyBaseAmplitude * activityFactor) + spikyOffset;
+
+            const smoothBaseAmplitude = networkCanvas.height * 0.3;
+            const smoothOffset = networkCanvas.height * 0.3;
+            const newSmoothPoint = (Math.random() * smoothBaseAmplitude * activityFactor) + smoothOffset;
+            
+            spikyWave.push(newSpikyPoint);
+            smoothWave.push(newSmoothPoint);
+        }
+
+        function drawNetworkGraph() {
+            if (!networkCanvas.isConnected) return;
+            
+            updateGraphData();
+
+            ctx.clearRect(0, 0, networkCanvas.width, networkCanvas.height);
+
+            ctx.fillStyle = '#0A0F14';
+            ctx.fillRect(0, 0, networkCanvas.width, networkCanvas.height);
+
+            const xStep = networkCanvas.width / (numPoints -1);
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < numPoints; i += 5) {
+                ctx.beginPath();
+                ctx.moveTo(i * xStep, 0);
+                ctx.lineTo(i * xStep, networkCanvas.height);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, networkCanvas.height - smoothWave[0]);
+            for (let i = 1; i < numPoints; i++) {
+                ctx.lineTo(i * xStep, networkCanvas.height - smoothWave[i]);
+            }
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, networkCanvas.height - spikyWave[0]);
+            for (let i = 1; i < numPoints; i++) {
+                ctx.lineTo(i * xStep, networkCanvas.height - spikyWave[i]);
+            }
+            ctx.stroke();
+
+            animationFrameId = requestAnimationFrame(drawNetworkGraph);
+        }
+
+        for (let i = 0; i < numPoints; i++) { 
+            spikyWave[i] = Math.random() * (networkCanvas.height * 0.5) + (networkCanvas.height * 0.1);
+            smoothWave[i] = Math.random() * (networkCanvas.height * 0.3) + (networkCanvas.height * 0.3);
+        }
+        
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                if(entry.target === networkCanvas) {
+                    resizeCanvas();
+                }
+            }
+        });
+        resizeObserver.observe(networkCanvas);
+
+        if (cliInput) {
+            const handleFocusOrInputForGraph = () => {
+                if (!longActivityTimer) { 
+                    activityFactor = 1.0;
+                    if (shortActivityTimer) clearTimeout(shortActivityTimer);
+                    shortActivityTimer = setTimeout(() => {
+                        activityFactor = 0.3;
+                        shortActivityTimer = null;
+                    }, 2000);
+                }
+            };
+
+            cliInput.addEventListener('focus', handleFocusOrInputForGraph);
+            cliInput.addEventListener('input', handleFocusOrInputForGraph);
+
+            cliInput.addEventListener('blur', () => {
+                if (cliInput.value.trim() === '' && !longActivityTimer) {
+                    activityFactor = 0.3; 
+                    if (shortActivityTimer) clearTimeout(shortActivityTimer);
+                    shortActivityTimer = null;
+                }
+            });
+        }
+    } else {
+        console.error('Network graph canvas not found');
+    }
+
+    let videoElementRef = null; 
+
+    function enterMovieMode(videoSrc) {
+        if (!niteLeftColumn || !cliOutput || !niteCliInputRow) return;
+        if (systemClearModule) systemClearModule.textContent = "status - showing video";
+
+        niteLeftColumn.classList.add('theater-mode-active');
+        cliOutput.classList.add('theater-mode-content-hidden');
+        cliOutput.classList.remove('theater-mode-content-visible');
+        niteCliInputRow.classList.add('theater-mode-content-hidden');
+        niteCliInputRow.classList.remove('theater-mode-content-visible');
+
+        setTimeout(() => { 
+            cliOutput.style.display = 'none';
+            niteCliInputRow.style.display = 'none';
+            
+            videoElementRef = document.createElement('video');
+            videoElementRef.src = videoSrc;
+            videoElementRef.autoplay = true;
+            videoElementRef.controls = false; 
+            videoElementRef.classList.add('video-player-temp');
+            
+            niteLeftColumn.prepend(videoElementRef);
+
+            videoElementRef.addEventListener('ended', () => {
+                exitMovieMode(); 
+            });
+            videoElementRef.addEventListener('error', (e) => {
+                console.error("Error playing video:", e);
+                exitMovieMode(); 
+            });
+        }, 300); 
+    }
+
+    function exitMovieMode() {
+        if (!videoElementRef) return; 
+
+        videoElementRef.style.transition = 'opacity 1.5s ease-out';
+        videoElementRef.style.opacity = '0';
+
+        setTimeout(() => {
+            if (videoElementRef && videoElementRef.parentNode === niteLeftColumn) {
+                niteLeftColumn.removeChild(videoElementRef);
+            }
+            videoElementRef = null;
+
+            niteLeftColumn.classList.remove('theater-mode-active');
+            
+            cliOutput.style.display = ''; 
+            niteCliInputRow.style.display = ''; 
+
+            cliOutput.classList.remove('theater-mode-content-hidden');
+            cliOutput.classList.add('theater-mode-content-visible');
+            niteCliInputRow.classList.remove('theater-mode-content-hidden');
+            niteCliInputRow.classList.add('theater-mode-content-visible');
+            if (systemClearModule) systemClearModule.textContent = "status - clear";
+        }, 1500); 
+    }
   </script>
 </body>
 </html>
